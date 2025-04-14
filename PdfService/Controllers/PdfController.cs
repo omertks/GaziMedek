@@ -36,73 +36,19 @@ namespace PdfService.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> UploadPdf(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-            {
-                return BadRequest("Dosya Gönderilemedi!!!");
-            }
-            else if (file.ContentType != "application/pdf")
-            {
-                return BadRequest("Sadece .pdf uzantılı dosyalar gönderilebilir!!!!");
-            }
-            else if (_configuration["PdfFolderPath"] == null)
-            {
-                Console.WriteLine("Path Değeri null!!!!");
-                return BadRequest("Path Değeri null!!!!");
-            }
-
-
-            // Dosyayı işle
-
-            var filePath = Path.Combine(_configuration["PdfFolderPath"], file.FileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-
-            return Ok(new
-            {
-                Result = "Başarılı Bir Şekilde Kaydedildi!!",
-                FilePath = filePath
-            });
-        }
-
         [HttpPost("medek")]
-        public async Task<IActionResult> ConvertMedekForm( int LessonId, int TeacherId,[FromForm] CreateMedekDto pdfs) // Burada List yerine kapsayıcı bir dto oluştur
+        public async Task<IActionResult> ConvertMedekForm( [FromForm] CreateMedekDto pdfs) // Burada List yerine kapsayıcı bir dto oluştur
         {
 
-            var result = _pdfEditingService.ConvertMedekForm("Deneme","Den-111","Ömer Tekeş",pdfs);
+            var resultPath = _pdfEditingService.ConvertMedekForm("Deneme","Den-111","Ömer Tekeş",pdfs);
 
-            return Ok(result);
+            MemoryStream stream = new MemoryStream(System.IO.File.ReadAllBytes(resultPath)); // path deki dosyayı byte haline getirip rame yazdık
+
+            stream.Position = 0; // bu dosyanın en başına gel demekmiş
+
+            return File(stream,"application/pdf","rapor.pdf");
+        
         }
-
-        [HttpGet("kapak-getir")]
-        public async Task<IFormFile> GetCoverByLesson(string lessonName, string lessonCode)
-        {
-
-            var pdfReader = new PdfReader("D:\\SistemAnalizi/icindekiler.pdf");
-
-            var acroField = pdfReader.AcroFields;
-
-            var acroForm = pdfReader.AcroForm;
-          
-            
-            Console.WriteLine("sa");
-
-            return null;
-
-        }
-
-
-
-
-
-
-
 
     }
 }

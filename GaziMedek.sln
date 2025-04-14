@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService", "UserService\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dto", "Dto\Dto.csproj", "{0B7CCE81-EBA1-4AED-B9D9-50AEF5B34DA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deneme", "Deneme\Deneme.csproj", "{4F672856-0AAC-4844-9B8A-457E46286EA9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolService", "SchoolService\SchoolService.csproj", "{B503B06D-7B14-46EE-A1BF-5F5DB74AABB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{0B7CCE81-EBA1-4AED-B9D9-50AEF5B34DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B7CCE81-EBA1-4AED-B9D9-50AEF5B34DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B7CCE81-EBA1-4AED-B9D9-50AEF5B34DA2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F672856-0AAC-4844-9B8A-457E46286EA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F672856-0AAC-4844-9B8A-457E46286EA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F672856-0AAC-4844-9B8A-457E46286EA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F672856-0AAC-4844-9B8A-457E46286EA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B503B06D-7B14-46EE-A1BF-5F5DB74AABB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B503B06D-7B14-46EE-A1BF-5F5DB74AABB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B503B06D-7B14-46EE-A1BF-5F5DB74AABB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B503B06D-7B14-46EE-A1BF-5F5DB74AABB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

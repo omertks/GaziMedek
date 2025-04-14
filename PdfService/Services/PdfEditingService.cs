@@ -150,10 +150,9 @@ namespace PdfService.Services
         }
 
 
-        public Document ConvertMedekForm(string lessonName, string lessonCode, String teacherName, CreateMedekDto pdfs)
+        public string ConvertMedekForm(string lessonName, string lessonCode, String teacherName, CreateMedekDto pdfs) // path dönecek
         {
-
-            if (pdfs.Icindekiler == null || pdfs.Icindekiler.Length <= 0)
+            if (pdfs.Icindekiler == null)
             {
                 throw new NullReferenceException("İçindekiler Null Geldi !! ");
             }
@@ -162,7 +161,12 @@ namespace PdfService.Services
 
             Directory.CreateDirectory(sourcePath);
 
-            var title_page = AddTitlePage(lessonName, lessonCode, teacherName, sourcePath);
+            // Bizim Oluşturmamız Gereken Dökümanlar:
+
+            var title_page = AddTitlePage(lessonName, lessonCode, teacherName, sourcePath); // Create Title Page
+
+
+            //Gönderilen Dökümanların Pdf e Eklenmesi
 
             Document result = new Document(PageSize.A4);
 
@@ -172,82 +176,54 @@ namespace PdfService.Services
 
                 result.Open();
 
-                PdfReader pdfReaderTitle = new PdfReader(sourcePath + "/title_page.pdf");
+                using (PdfReader pdfReaderTitle = new PdfReader(sourcePath + "/title_page.pdf"))
+                {
+                    pdfCopy.AddPage(pdfCopy.GetImportedPage(pdfReaderTitle, 1)); // Title Page'in eklenmesi
+                }
 
-                pdfCopy.AddPage(pdfCopy.GetImportedPage(pdfReaderTitle, 1));
 
                 // İçindekiler sayfasının eklenmesi
-                MergePdfFiles(pdfCopy, pdfs.Icindekiler);
+                foreach (var Icindeki in pdfs.Icindekiler)
+                {
+                    MergePdfFiles(pdfCopy, Icindeki);
+                }
 
-                var path12 = AddTransitionPage(sourcePath, "AKTS-ECTS FORMLARI");
 
-                PdfReader pdfReaderAkts = new PdfReader(path12);
+                // burayı generic bir metot haline getir
+                var pathAkts = AddTransitionPage(sourcePath, "AKTS-ECTS FORMLARI"); // Bu yöntemi title içinde yap
 
-                pdfCopy.AddPage(pdfCopy.GetImportedPage(pdfReaderAkts, 1));
+                AddTransitionPageToPdfCopy(pathAkts, pdfCopy);
 
-                MergePdfFiles(pdfCopy, pdfs.AktsEctsFormlari);
 
-                var path122 = AddTransitionPage(sourcePath, "SINAV İMZA ÇİZELGELERİ");
+                foreach (var AktsEctsForm in pdfs.AktsEctsFormlari)
+                {
+                    MergePdfFiles(pdfCopy, AktsEctsForm);
+                }
 
-                PdfReader pdfReaderSinav = new PdfReader(path122);
 
-                pdfCopy.AddPage(pdfCopy.GetImportedPage(pdfReaderAkts, 1));
+                var pathSinavC = AddTransitionPage(sourcePath, "SINAV İMZA ÇİZELGELERİ");
+
+                AddTransitionPageToPdfCopy(pathSinavC, pdfCopy);
 
                 result.Close();
+
+                
+
             }
 
+            return sourcePath + "/medek.pdf";
 
-            return result;
         }
 
+        public void AddTransitionPageToPdfCopy(string path, PdfCopy pdfCopy)
+        {
+            using (PdfReader pdfReader = new PdfReader(path))
+            {
 
-        // Buraya iyice bak
-        //public byte[] AddTitlePageGecici(string lessonName, string lessonCode, String teacherName)
-        //{
-
-        //    // Document nesnesi oluştur
-        //    Document doc = new Document(PageSize.A4);
-
-        //    String path = "D:\\SistemAnalizi\\Pdfs\\Deneme/" + lessonName + "_" + DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
-
-        //    Directory.CreateDirectory(path);
-
-        //    using (MemoryStream stream = new MemoryStream())
-        //    {
-
-        //        PdfWriter pdfWriter = PdfWriter.GetInstance(doc, stream);
-
-        //        pdfWriter.Open();
-
-        //        // PDF aç
-        //        doc.Open();
-
-        //        // x en fazla 595 y en fazla 842 olabilir.
-
-        //        WriteToPdf(pdfWriter.DirectContent, "TUSAS KAZAN MYO", 25, 300, 674, BaseFont.TIMES_BOLD);
-
-
-        //        WriteToPdf(pdfWriter.DirectContent, lessonName + " -" + lessonCode, 15, 300, 420, BaseFont.TIMES_BOLD);
-
-
-        //        WriteToPdf(pdfWriter.DirectContent, "2024-2025 BAHAR", 15, 300, 350, BaseFont.TIMES_BOLD);
-
-
-        //        WriteToPdf(pdfWriter.DirectContent, "DERS DOSYASI", 15, 300, 250, BaseFont.TIMES_BOLD);
-
-
-        //        WriteToPdf(pdfWriter.DirectContent, teacherName, 15, 300, 50, BaseFont.TIMES_BOLD);
-
-
-        //        //WriteToPdf(pdfWriter.DirectContent,"Deneme",20,20,20,BaseFont.TIMES_BOLD);
-
-        //        // PDF'i kapat
-        //        doc.Close();
-
-        //        return stream.ToArray(); // geçici olarak çıkartma
-        //    }
-        //}
-
+                // Burası sayfa sayısı kadar dönebilir
+                pdfCopy.AddPage(pdfCopy.GetImportedPage(pdfReader, 1));
+            }
+        }
 
     }
 }

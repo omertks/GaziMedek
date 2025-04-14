@@ -13,7 +13,7 @@ namespace UserService.Db
         {
             base.OnConfiguring(optionsBuilder);
 
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=user_db;Username=postgres;Password=gazi_postgre_medek;");
+            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=gazi_postgre_medek;");
 
         }
 

@@ -17,6 +17,17 @@ namespace UserService
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // CORS politikasý ekleyin
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", policy =>
+                {
+                    policy.AllowAnyOrigin()  // Herhangi bir kaynaða izin verir
+                          .AllowAnyMethod()  // Tüm HTTP yöntemlerine izin verir (GET, POST, PUT, DELETE vb.)
+                          .AllowAnyHeader(); // Tüm baþlýklara izin verir
+                });
+            });
+
 
             builder.Services.AddControllers();
 
@@ -71,6 +82,7 @@ namespace UserService
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseCors("AllowAllOrigins");
 
             app.MapControllers();
 

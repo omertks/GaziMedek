@@ -11,7 +11,7 @@ namespace Deneme
         {
             IPdfEditingService pdfEditingService = new PdfEditingService();
 
-            var titlePage = pdfEditingService.AddTitlePage("Programlama Temelleri","Bil-101", "Mahmut KASAP");
+            var titlePage = pdfEditingService.AddTitlePage("Programlama Temelleri","Bil-101", "Mahmut KASAP","");
 
             Console.WriteLine("Kapak Oluşturuldu");
 

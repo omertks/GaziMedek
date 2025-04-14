@@ -41,7 +41,7 @@ namespace UserService.Controllers
         {
             var users = await _userService.GetAll();
 
-            // Burası daha verimli hale getirilebilinir.
+            // Burası daha verimli hale getirilebilinir. Tüm kullanıcılar çekilmedende yapılabilir.
             var user = users.FirstOrDefault(u => u.Email == userLoginDto.EmailAddress && u.Password == userLoginDto.Password);
 
 

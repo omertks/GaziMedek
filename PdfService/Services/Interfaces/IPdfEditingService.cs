@@ -8,7 +8,7 @@ namespace PdfService.Services.Interfaces
     {
 
         // Ana metod aşşağıdakileri kullanacak
-        public Document ConvertMedekForm(string lessonName, string lessonCode, String teacherName, CreateMedekDto pdfs);
+        public string ConvertMedekForm(string lessonName, string lessonCode, String teacherName, CreateMedekDto pdfs);
 
         public Document AddTitlePage(string lessonName, string lessonCode, String teacherName, string sourcePath);
 
