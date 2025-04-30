@@ -51,6 +51,11 @@ namespace UserService.Repository
             return users;
         }
 
+        public User GetUserByEmailAndPassword(string email, string password)
+        {
+            return _context.users.Where(u => u.Email == email).Where(u => u.Password == password).FirstOrDefault();
+        }
+
         public async Task Update(int id, User user)
         {
             User dbUser = await FindById(id);

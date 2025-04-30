@@ -1,9 +1,8 @@
 ﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
-using Microsoft.AspNetCore.Http.HttpResults;
 using PdfService.Dtos;
 using PdfService.Services.Interfaces;
-using System.Reflection.PortableExecutable;
+using System.IO;
 
 namespace PdfService.Services
 {
@@ -24,7 +23,7 @@ namespace PdfService.Services
             throw new NotImplementedException();
         }
 
-        public Document AddTitlePage(string lessonName, string lessonCode, String teacherName, string sourcePath)
+        public Document AddTitlePage(string lessonName, string lessonCode, String teacherName, string fakulteName, string sourcePath)
         {
 
             // Document nesnesi oluştur
@@ -45,7 +44,7 @@ namespace PdfService.Services
 
                 // x en fazla 595 y en fazla 842 olabilir.
 
-                WriteToPdf(pdfWriter.DirectContent, "TUSAS KAZAN MYO", 25, 300, 674, BaseFont.TIMES_BOLD);
+                WriteToPdf(pdfWriter.DirectContent, fakulteName, 25, 300, 674, BaseFont.TIMES_BOLD);
 
 
                 WriteToPdf(pdfWriter.DirectContent, lessonName + " -" + lessonCode, 15, 300, 420, BaseFont.TIMES_BOLD);
@@ -99,7 +98,9 @@ namespace PdfService.Services
         private void WriteToPdf(PdfContentByte cb, String content, int fontSize = 20, /*BaseColor color,*/ int x = 20, int y = 20, string font = BaseFont.TIMES_BOLD)
         {
             cb.BeginText();
-            BaseFont bf = BaseFont.CreateFont(font, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            //BaseFont bf = BaseFont.CreateFont(font, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arial.ttf");
+            BaseFont bf = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
 
             // mETNİ ORTALAMAK İÇİN basılacak metnin genişliğinin alınması
             float textWidth = bf.GetWidthPoint(content, fontSize);
@@ -150,20 +151,20 @@ namespace PdfService.Services
         }
 
 
-        public string ConvertMedekForm(string lessonName, string lessonCode, String teacherName, CreateMedekDto pdfs) // path dönecek
+        public string ConvertMedekForm(CreateMedekDto createMedekDto) // path dönecek
         {
-            if (pdfs.Icindekiler == null)
+            if (createMedekDto.Icindekiler == null)
             {
                 throw new NullReferenceException("İçindekiler Null Geldi !! ");
             }
 
-            String sourcePath = "D:\\SistemAnalizi\\Pdfs\\Deneme/" + lessonName + "_" + DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
+            String sourcePath = "D:\\SistemAnalizi\\Pdfs\\Deneme/" + createMedekDto.LessonName + "_" + DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
 
             Directory.CreateDirectory(sourcePath);
 
             // Bizim Oluşturmamız Gereken Dökümanlar:
 
-            var title_page = AddTitlePage(lessonName, lessonCode, teacherName, sourcePath); // Create Title Page
+            var title_page = AddTitlePage(createMedekDto.LessonName, createMedekDto.LessonCode, createMedekDto.TeacherName, createMedekDto.FakulteName, sourcePath); // Create Title Page
 
 
             //Gönderilen Dökümanların Pdf e Eklenmesi
@@ -183,7 +184,7 @@ namespace PdfService.Services
 
 
                 // İçindekiler sayfasının eklenmesi
-                foreach (var Icindeki in pdfs.Icindekiler)
+                foreach (var Icindeki in createMedekDto.Icindekiler)
                 {
                     MergePdfFiles(pdfCopy, Icindeki);
                 }
@@ -195,20 +196,106 @@ namespace PdfService.Services
                 AddTransitionPageToPdfCopy(pathAkts, pdfCopy);
 
 
-                foreach (var AktsEctsForm in pdfs.AktsEctsFormlari)
+                foreach (var AktsEctsForm in createMedekDto.AktsEctsFormlari)
                 {
                     MergePdfFiles(pdfCopy, AktsEctsForm);
                 }
-
 
                 var pathSinavC = AddTransitionPage(sourcePath, "SINAV İMZA ÇİZELGELERİ");
 
                 AddTransitionPageToPdfCopy(pathSinavC, pdfCopy);
 
-                result.Close();
+                foreach (var pdf in createMedekDto.SinavImzaCizergeleri)
+                {
+                    MergePdfFiles(pdfCopy, pdf);
+                }
 
+                var pathSinavI = AddTransitionPage(sourcePath, "SINAV İSTATİSTİKLERİ");
+
+                AddTransitionPageToPdfCopy(pathSinavI, pdfCopy);
+
+
+                foreach (var pdf in createMedekDto.SinavIstatistikleri)
+                {
+                    MergePdfFiles(pdfCopy, pdf);
+                }
                 
+                var pathVizeSS = AddTransitionPage(sourcePath, "VİZE SINAV SORULARI");
 
+                AddTransitionPageToPdfCopy(pathVizeSS, pdfCopy);
+
+
+                foreach (var pdf in createMedekDto.VizeSorulari)
+                {
+                    MergePdfFiles(pdfCopy, pdf);
+                }
+
+                var pathVizeSE = AddTransitionPage(sourcePath, "VİZE SINAVI EN DÜŞÜK, EN YÜKSEK VE ORTA NOTLAR ");
+
+                AddTransitionPageToPdfCopy(pathVizeSE, pdfCopy);
+
+                foreach (var pdf in createMedekDto.VizeSinavDusukOrtaYuksekNotlar)
+                {
+                    MergePdfFiles(pdfCopy, pdf);
+                }
+
+                var pathVizeFSS = AddTransitionPage(sourcePath, "FİNAL SINAV SORULARI");
+
+                AddTransitionPageToPdfCopy(pathVizeSE, pdfCopy);
+
+                foreach (var pdf in createMedekDto.FinalSorulari)
+                {
+                    MergePdfFiles(pdfCopy, pdf);
+                }
+
+                var pathFinalSE = AddTransitionPage(sourcePath, "FİNAL SINAVI EN DÜŞÜK, EN YÜKSEK VE ORTA NOTLAR ");
+
+                AddTransitionPageToPdfCopy(pathFinalSE, pdfCopy);
+
+                foreach (var pdf in createMedekDto.FinalSinavDusukOrtaYuksekNotlar)
+                {
+                    MergePdfFiles(pdfCopy, pdf);
+                }
+
+                var pathButunlemeSS = AddTransitionPage(sourcePath, "BÜTÜNLEME SINAV SORULARI");
+
+                AddTransitionPageToPdfCopy(pathButunlemeSS, pdfCopy);
+
+                foreach (var pdf in createMedekDto.ButSorulari)
+                {
+                    MergePdfFiles(pdfCopy, pdf);
+                }
+
+                var pathRNC = AddTransitionPage(sourcePath, "RESMİ NOT ÇİZELGELERİ");
+
+                AddTransitionPageToPdfCopy(pathButunlemeSS, pdfCopy);
+
+                foreach (var pdf in createMedekDto.ResmiNotCizergesi)
+                {
+                    MergePdfFiles(pdfCopy, pdf);
+                }
+
+
+                var pathDDC = AddTransitionPage(sourcePath, "DERS DEVAM ÇİZELGELERİ");
+
+                AddTransitionPageToPdfCopy(pathDDC, pdfCopy);
+
+                foreach (var pdf in createMedekDto.DersDevamCizergesi)
+                {
+                    MergePdfFiles(pdfCopy, pdf);
+                }
+
+                var pathDDA = AddTransitionPage(sourcePath, "DERS DEĞERLENDİRME ANKETLERİ");
+
+                AddTransitionPageToPdfCopy(pathDDA, pdfCopy);
+
+                foreach (var pdf in createMedekDto.DegerlendirmeAnketleri )
+                {
+                    MergePdfFiles(pdfCopy, pdf);
+                }
+
+
+                result.Close();
             }
 
             return sourcePath + "/medek.pdf";

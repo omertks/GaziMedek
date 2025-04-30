@@ -20,6 +20,18 @@ namespace SchoolService
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // CORS politikasý ekleyin
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins", policy =>
+                {
+                    policy.AllowAnyOrigin()  // Herhangi bir kaynaða izin verir
+                          .AllowAnyMethod()  // Tüm HTTP yöntemlerine izin verir (GET, POST, PUT, DELETE vb.)
+                          .AllowAnyHeader(); // Tüm baþlýklara izin verir
+                });
+            });
+
+            #region Services - DI
 
             builder.Services.AddTransient<SchoolServiceDbContext>();
 
@@ -28,14 +40,28 @@ namespace SchoolService
 
 
             builder.Services.AddTransient<ITeacherRepository, TeacherRepository>();
-
             builder.Services.AddTransient<ITeacherService, TeacherService>();
-            
+
+
             builder.Services.AddTransient<IBranchRepository, BranchRepository>();
+            builder.Services.AddTransient<IBranchService, BranchService>();
+
 
             builder.Services.AddTransient<IUniversityRepository, UniversityRepository>();
             builder.Services.AddTransient<IUniversityService, UniversityService>();
 
+
+            builder.Services.AddTransient<IDepartmentRepository, DepartmentRepository>();
+            builder.Services.AddTransient<IDepartmentService, DepartmentService>();
+
+
+            builder.Services.AddTransient<IBaseLessonRepository, BaseLessonRepository>();
+            builder.Services.AddTransient<IBaseLessonService, BaseLessonService>();
+
+            builder.Services.AddTransient<ILessonRepository, LessonRepository>();
+            builder.Services.AddTransient<ILessonService, LessonService>();
+
+            #endregion
 
 
 
@@ -47,6 +73,10 @@ namespace SchoolService
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            // Cors
+
+            app.UseCors("AllowAllOrigins");
 
             app.UseAuthorization();
 

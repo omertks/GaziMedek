@@ -4,9 +4,7 @@
     {
 
 
-        public DateTime AcademicYear { get; set; }
-
-
+        public DateTime AcademicYear { get; set; } // Burayı stringe çek
 
         public int TeacherId { get; set; }
         public Teacher Teacher { get; set; }

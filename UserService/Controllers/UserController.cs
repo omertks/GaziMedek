@@ -19,10 +19,7 @@ namespace UserService.Controllers
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
 
-        // Jwt için gerekli parametreler
-        private readonly string _jwtKey;
-        private readonly string _jwtIssuer;
-        private readonly string _jwtAudience;
+
 
 
         public UserController(IUserService userService, IConfiguration configuration)
@@ -30,27 +27,25 @@ namespace UserService.Controllers
             _userService = userService;
             _configuration = configuration;
 
-            _jwtKey = configuration["Jwt:Key"];
-            _jwtIssuer = configuration["Jwt:Issuer"];
-            _jwtAudience = configuration["Jwt:Audience"];
+            //_jwtKey = configuration["Jwt:Key"];
+            //_jwtIssuer = configuration["Jwt:Issuer"];
+            //_jwtAudience = configuration["Jwt:Audience"];
         }
 
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginDto userLoginDto)
         {
-            var users = await _userService.GetAll();
 
-            // Burası daha verimli hale getirilebilinir. Tüm kullanıcılar çekilmedende yapılabilir.
-            var user = users.FirstOrDefault(u => u.Email == userLoginDto.EmailAddress && u.Password == userLoginDto.Password);
+            var resultUserDto = _userService.LoginUser(userLoginDto.EmailAddress, userLoginDto.Password);
 
 
-            if (user == null)
+
+            if (resultUserDto.IsLogin == false)
                 return Unauthorized(new { message = "Mail adresi veya Şifresi Hatalı" });
 
-            var token = GenerateJwtToken(user);
 
-            return Ok(new { Token = token });
+            return Ok(resultUserDto);
 
         }
 
@@ -84,32 +79,7 @@ namespace UserService.Controllers
         }
 
 
-        private string GenerateJwtToken(User user)
-        {
-            // Tokenın içerisine gömmek istediğim verileri burada ekliyorum
-            var claims = new[]
- {
-    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // Kullanıcı ID'si
-    new Claim(ClaimTypes.Name, user.FirstName),              // Kullanıcı Adı
-    new Claim(ClaimTypes.Email, user.Email),                 // Kullanıcı Email
-    new Claim(JwtRegisteredClaimNames.Sub, user.Email),      // Konvansiyonel 'sub' (Subject) claim, burada email kullanılıyor. Buraya Bak
-    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // JWT'nin benzersiz kimliği (JTI)
-};
 
-            // Şifreyi şifreleme
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            // Token Oluşturma
-            var token = new JwtSecurityToken(
-                _jwtIssuer,
-                _jwtAudience,
-                claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpirationInMinutes"])),
-                signingCredentials: creds);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
 
 
     }
