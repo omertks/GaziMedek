@@ -37,20 +37,19 @@ namespace PdfService.Controllers
 
 
         [HttpPost("medek")]
-        public async Task<IActionResult> ConvertMedekForm([FromForm] CreateMedekDto createMedekDto) 
+        public async Task<IActionResult> ConvertMedekForm([FromForm] CreateMedekDto createMedekDto)
         {
-                // Burada SchoolService ile iletişime geçerek teacher ve lesson bilgilerini çekicem
+            // Burada SchoolService ile iletişime geçerek teacher ve lesson bilgilerini çekicem
 
 
-                var resultPath = _pdfEditingService.ConvertMedekForm(createMedekDto);
+            var resultPath = await _pdfEditingService.ConvertMedekForm(createMedekDto);
 
-                MemoryStream stream = new MemoryStream(System.IO.File.ReadAllBytes(resultPath)); // path deki dosyayı byte haline getirip rame yazdık
+            MemoryStream stream = new MemoryStream(System.IO.File.ReadAllBytes(resultPath)); // path deki dosyayı byte haline getirip rame yazdık
 
-                stream.Position = 0; // bu dosyanın en başına gel demekmiş
+            stream.Position = 0; // bu dosyanın en başına gel demekmiş
 
-                return File(stream, "application/pdf", "rapor.pdf");
-
-            }
+            return File(stream, "application/pdf", "rapor.pdf");
 
         }
     }
+}

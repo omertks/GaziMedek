@@ -3,11 +3,20 @@ using iTextSharp.text.pdf;
 using PdfService.Dtos;
 using PdfService.Services.Interfaces;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace PdfService.Services
 {
     public class PdfEditingService : IPdfEditingService
     {
+
+        private readonly IPdfSaveService _pdfSaveService;
+
+        public PdfEditingService (IPdfSaveService pdfSaveService)
+        {
+            _pdfSaveService = pdfSaveService;
+        }
+
         public Document AddAboutPage(Document src)
         {
             throw new NotImplementedException();
@@ -151,7 +160,7 @@ namespace PdfService.Services
         }
 
 
-        public string ConvertMedekForm(CreateMedekDto createMedekDto) // path dönecek
+        public async Task<string> ConvertMedekForm(CreateMedekDto createMedekDto) // path dönecek
         {
             if (createMedekDto.Icindekiler == null)
             {
@@ -297,6 +306,18 @@ namespace PdfService.Services
 
                 result.Close();
             }
+
+
+            CreateMedekFormDto createMedekFormDto = new CreateMedekFormDto()
+            {
+                Path = sourcePath + "/medek.pdf",
+                Name = "deneme",
+                LessonId = 12,
+                UserId = createMedekDto.UserId,
+            };
+
+
+            await _pdfSaveService.MedekFormSaveToDb(createMedekFormDto);
 
             return sourcePath + "/medek.pdf";
 

@@ -7,6 +7,7 @@
 
         public string FakulteName { get; set; } = "TUSAS KAZAN MYO";
 
+        public int UserId { get; set; }
         public string TeacherName { get; set; }
         
         public string LessonName { get; set; }

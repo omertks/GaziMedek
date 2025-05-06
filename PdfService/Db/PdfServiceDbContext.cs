@@ -1,17 +1,13 @@
 ﻿using Entity.Models;
 using Microsoft.EntityFrameworkCore;
+using PdfService.Models;
 
 namespace PdfService.Db
 {
     public class PdfServiceDbContext: DbContext
     {
 
-        // tables
-        public DbSet<Pdf> pdfs { get; set; }
-
-        public DbSet<PdfTransactionLog> pdf_transaction_logs { get; set; }
-
-
+        public DbSet<MedekForm> MedekForms { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,7 +18,8 @@ namespace PdfService.Db
         {
             base.OnConfiguring(optionsBuilder);
 
-            // Kullanılacak db yi buraya gir
+            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=pdf_service_db;Username=postgres;Password=gazi_postgre_medek;");
+
         }
 
     }

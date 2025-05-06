@@ -16,6 +16,5 @@ namespace Entity.Models
 
         public UserRole Role { get; set; } // Kullanıcının rolü
 
-        public int TeacherId { get; set; }
     }
 }
