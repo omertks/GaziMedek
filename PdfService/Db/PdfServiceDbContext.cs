@@ -1,5 +1,4 @@
-﻿using Entity.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PdfService.Models;
 
 namespace PdfService.Db

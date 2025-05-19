@@ -9,7 +9,6 @@ namespace SchoolService.Controllers
     [Route("api/[controller]")]
     public class UniversityController : Controller
     {
-        // Buraya Sadece Admin Erişicek
 
         private IUniversityService _universityService;
 

@@ -1,5 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
 using SchoolService.Db;
+using SchoolService.Mapper;
 using SchoolService.Repositories;
 using SchoolService.Repositories.Interfaces;
 using SchoolService.Services;
@@ -15,7 +17,12 @@ namespace SchoolService
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // String olarak gelen enum deðerlerini dönüþtürmeyi saðlar
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -33,18 +40,21 @@ namespace SchoolService
 
             #region Services - DI
 
+
+            // mapper
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+            // DbContext
+            builder.Services.AddDbContext<SchoolServiceDbContext>(opt => { opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")); });
+
             builder.Services.AddTransient<SchoolServiceDbContext>();
 
 
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>)); // Generic
 
 
-            builder.Services.AddTransient<ITeacherRepository, TeacherRepository>();
-            builder.Services.AddTransient<ITeacherService, TeacherService>();
-
-
-            builder.Services.AddTransient<IBranchRepository, BranchRepository>();
-            builder.Services.AddTransient<IBranchService, BranchService>();
+            builder.Services.AddTransient<IUserRepository, UserRepository>();
+            builder.Services.AddTransient<IUserService, UserService>();
 
 
             builder.Services.AddTransient<IUniversityRepository, UniversityRepository>();
@@ -54,9 +64,6 @@ namespace SchoolService
             builder.Services.AddTransient<IDepartmentRepository, DepartmentRepository>();
             builder.Services.AddTransient<IDepartmentService, DepartmentService>();
 
-
-            builder.Services.AddTransient<IBaseLessonRepository, BaseLessonRepository>();
-            builder.Services.AddTransient<IBaseLessonService, BaseLessonService>();
 
             builder.Services.AddTransient<ILessonRepository, LessonRepository>();
             builder.Services.AddTransient<ILessonService, LessonService>();

@@ -1,4 +1,5 @@
-﻿using SchoolService.Dtos.Lesson;
+﻿using AutoMapper;
+using SchoolService.Dtos.Lesson;
 using SchoolService.Models;
 using SchoolService.Repositories.Interfaces;
 using SchoolService.Services.Interfaces;
@@ -11,24 +12,18 @@ namespace SchoolService.Services
 
         private readonly ILessonRepository _lessonRepository;
 
-        private readonly IBaseLessonRepository _baseLessonRepository;
+        private readonly IMapper _mapper;
 
-        public LessonService(ILessonRepository lessonRepository, IBaseLessonRepository baseLessonRepository)
+        public LessonService(ILessonRepository lessonRepository, IMapper mapper)
         {
             _lessonRepository = lessonRepository;
-            _baseLessonRepository = baseLessonRepository;
+
+            _mapper = mapper;
         }
-
-
 
         public async Task CreateLesson(CreateLessonDto createLessonDto)
         {
-            Lesson lesson = new Lesson()
-            {
-                AcademicYear = createLessonDto.AcademicYear,
-                BaseLessonId = createLessonDto.BaseLessonId,
-                TeacherId = createLessonDto.TeacherId
-            };
+            var lesson = _mapper.Map<Lesson>(createLessonDto);
 
             await _lessonRepository.CreateAsync(lesson);
         }
@@ -38,54 +33,48 @@ namespace SchoolService.Services
             await _lessonRepository.DeleteAsync(id);
         }
 
-        public async Task<List<Lesson>> GetAllLessons()
+        public async Task<ResultLessonDto> GetLessonById(int id)
         {
-            return await _lessonRepository.GetListAsync();
+            var lesson = await _lessonRepository.GetByIdAsync(id);
+
+            return _mapper.Map<ResultLessonDto>(lesson);
         }
 
-        public async Task<List<Lesson>> GetAllLessonsByBaseLessonId(int id)
+        public async Task<List<ResultLessonDto>> GetLessons()
         {
-            return await _lessonRepository.GetFilteredListAsync(l => l.BaseLessonId == id);
+            var lessons = await _lessonRepository.GetListAsync();
+
+            return _mapper.Map<List<ResultLessonDto>>(lessons);
         }
 
-        public async Task<List<ResultLessonDto>> GetLessonsByTeacherId(int id)
+        public async Task<List<ResultLessonDto>> GetLessonsByDepartmentId(int id)
+        {
+            var lessons = await _lessonRepository.GetFilteredListAsync(l => l.DepartmentId == id);
+
+            return _mapper.Map<List<ResultLessonDto>>(lessons);
+        }
+
+        // Bu çalışmaya bilir buna dikkat et
+        public async Task<List<ResultLessonDto>> GetLessonsByUniversityId(int id)
+        {
+            var lessons = await _lessonRepository.GetFilteredListAsync(l => l.Department.UniversityId == id);
+
+            return _mapper.Map<List<ResultLessonDto>>(lessons);
+        }
+
+
+        public async Task<List<ResultLessonDto>> GetLessonsByUserId(int id)
         {
             var lessons = await _lessonRepository.GetFilteredListAsync(l => l.TeacherId == id);
 
-            List<ResultLessonDto> result = new List<ResultLessonDto>();
-
-            foreach (var lesson in lessons)
-            {
-                var baseLesson = await _baseLessonRepository.GetByIdAsync(lesson.BaseLessonId);
-
-                var rs = new ResultLessonDto()
-                {
-                    Id = lesson.Id,
-                    LessonName = baseLesson.Name,
-                    LessonCode = baseLesson.Code
-                };
-
-                result.Add(rs);
-            }
-
-            return result;
-
+            return _mapper.Map<List<ResultLessonDto>>(lessons);
         }
-
-        public async Task<Lesson> GetLessonById(int id)
-        {
-            return await _lessonRepository.GetByIdAsync(id);
-        }
-
-
 
         public async Task UpdateLesson(UpdateLessonDto updateLessonDto, int id)
         {
             var lesson = await _lessonRepository.GetByIdAsync(id);
 
-            lesson.AcademicYear = updateLessonDto.AcademicYear;
-            lesson.TeacherId = updateLessonDto.TeacherId;
-            lesson.BaseLessonId = updateLessonDto.BaseLessonId;
+            _mapper.Map(lesson, updateLessonDto);
 
             await _lessonRepository.UpdateAsync(lesson);
         }

@@ -1,4 +1,4 @@
-﻿using Entity.Models;
+﻿using UserService.Models;
 using UserService.Dtos.User;
 
 namespace UserService.Service.Interfaces
@@ -7,6 +7,8 @@ namespace UserService.Service.Interfaces
     {
 
         public ResultUserDto LoginUser(string email, string password);
+
+        public Task SaveUserAsync(CreateUserDto createUserDto);
 
     }
 }

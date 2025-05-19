@@ -3,9 +3,7 @@
     public class CreateUniversityDto
     {
 
-        public string Name { get; set; }
-
-        // Buraya Sonradan Eklemeler Yapılabilir
+        public string UniversityName { get; set; }
 
     }
 }

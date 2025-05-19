@@ -10,20 +10,17 @@ namespace SchoolService.Db
 
         public DbSet<Department> Departments { get; set; }
 
-        public DbSet<Branch> Branches { get; set; }
-
-
-        public DbSet<Teacher> Teachers { get; set; }
-
-        public DbSet<BaseLesson> BaseLessons { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public DbSet<Lesson> Lessons { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder): base()
+        //{
+        //    optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=school_db;Username=postgres;Password=gazi_postgre_medek;");
+        //}
 
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=school_db;Username=postgres;Password=gazi_postgre_medek;");
+        public SchoolServiceDbContext(DbContextOptions options):base(options)
+        {
 
         }
 
@@ -43,29 +40,21 @@ namespace SchoolService.Db
 
 
 
-            // Depratment 1 - - - > 0..n Branch
-
-            modelBuilder.Entity<Branch>()
-                .HasOne(b => b.Department)
-                .WithMany(d => d.Branches)
-                .HasForeignKey(b => b.DepartmentId)
+            // Department 1 - - - - > 0..n Teacher
+            
+            modelBuilder.Entity<User>()
+                .HasOne(t => t.Department)
+                .WithMany(b => b.Users)
+                .HasForeignKey(t => t.DepartmentId)
                 .OnDelete(DeleteBehavior.Cascade);
 
 
-            // Branch 1 - - - - > 0..n Teacher
-            
-            modelBuilder.Entity<Teacher>()
-                .HasOne(t => t.Branch)
-                .WithMany(b => b.Teachers)
-                .HasForeignKey(t => t.BranchId); // bunun için onDelete bak
+            // Department 1 - - - - - > 0..1 Lesson
 
-
-            // Branch 1 - - - - - > 0..1 BaseLesson
-
-            modelBuilder.Entity<BaseLesson>()
-                .HasOne(b => b.Branch)
-                .WithMany(b => b.BaseLessons)
-                .HasForeignKey(b => b.BranchId);
+            modelBuilder.Entity<Lesson>()
+                .HasOne(b => b.Department)
+                .WithMany(b => b.Lessons)
+                .HasForeignKey(b => b.DepartmentId);
 
 
 
@@ -77,20 +66,6 @@ namespace SchoolService.Db
                 .HasOne(l => l.Teacher)
                 .WithMany(t => t.Lessons)
                 .HasForeignKey(l => l.TeacherId);
-
-
-            // BaseLesson 1  ---  -- - -- - > 0..1 Lesson
-
-            modelBuilder.Entity<Lesson>()
-                .HasOne(l => l.BaseLesson)
-                .WithMany(b => b.Lessons)
-                .HasForeignKey(l => l.BaseLessonId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            
-
-
-
 
         }
     }

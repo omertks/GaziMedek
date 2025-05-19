@@ -1,5 +1,5 @@
-﻿using Dto.Dtos.User;
-using Entity.Models;
+﻿using UserService.Dtos.User;
+using UserService.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +9,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using UserService.Service.Interfaces;
+using System.Net.Http;
+using UserService.Enums;
+
 
 namespace UserService.Controllers
 {
@@ -49,6 +52,15 @@ namespace UserService.Controllers
 
         }
 
+        [HttpPost("save-user")]
+        public async Task<IActionResult> SaveUser([FromBody] CreateUserDto createUserDto)
+        {
+
+            await _userService.SaveUserAsync(createUserDto);
+
+            return Created("", new { Message = "User başarıyla her iki servise kaydedildi." });
+        }
+
         [HttpPost("regiter")]
         public async Task<IActionResult> Register([FromBody] UserRegisterDto userRegisterDto)
         {
@@ -70,12 +82,17 @@ namespace UserService.Controllers
         public async Task<IActionResult> AuthorizeMethod()
         {
 
+            return Ok(new { Message = "Bu sayfa yetkili kişilerce girilir!!! "});
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetUsers()
+        {
             var users = await _userService.GetAll();
 
-            return Ok(new { Message = "Bu sayfa yetkili kişilerce girilir!!! ", Users = users });
-
-
-
+            return Ok(users);
+            
         }
 
 

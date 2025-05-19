@@ -1,7 +1,9 @@
-﻿using SchoolService.Dtos.University;
+﻿using AutoMapper;
+using SchoolService.Dtos.University;
 using SchoolService.Models;
 using SchoolService.Repositories.Interfaces;
 using SchoolService.Services.Interfaces;
+using System.Runtime.CompilerServices;
 
 namespace SchoolService.Services
 {
@@ -10,18 +12,18 @@ namespace SchoolService.Services
 
         private readonly IUniversityRepository _universityRepository;
 
+        private readonly IMapper _mapper;
 
-        public UniversityService(IUniversityRepository universityRepository)
+
+        public UniversityService(IUniversityRepository universityRepository, IMapper mapper)
         {
             _universityRepository = universityRepository;
+            _mapper = mapper;
         }
 
         public async Task CreateUniversity(CreateUniversityDto createUniversityDto)
         {
-            University university = new University()
-            {
-                UniverstyName = createUniversityDto.Name
-            };
+            University university = _mapper.Map<University>(createUniversityDto);
 
             await _universityRepository.CreateAsync(university);
         }
@@ -31,21 +33,25 @@ namespace SchoolService.Services
             await _universityRepository.DeleteAsync(id);
         }
 
-        public async Task<List<University>> GetAllUniversities()
+        public async Task<List<ResultUniversityDto>> GetAllUniversities()
         {
-            return await _universityRepository.GetListAsync();
+            var universities = await _universityRepository.GetListAsync();
+
+            return _mapper.Map<List<ResultUniversityDto>>(universities);
         }
 
-        public async Task<University> GetUniversityById(int id)
+        public async Task<ResultUniversityDto> GetUniversityById(int id)
         {
-            return await _universityRepository.GetByIdAsync(id);
+            var university = await _universityRepository.GetByIdAsync(id);
+
+            return _mapper.Map<ResultUniversityDto>(university);
         }
 
         public async Task UpdateUniversity(UpdateUniversityDto updateUniversityDto, int id)
         {
             var uni = await _universityRepository.GetByIdAsync(id);
 
-            uni.UniverstyName = updateUniversityDto.Name;
+            _mapper.Map(uni, updateUniversityDto);
 
             await _universityRepository.UpdateAsync(uni);
         }

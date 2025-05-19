@@ -10,11 +10,11 @@ namespace PdfService.Services
     public class PdfEditingService : IPdfEditingService
     {
 
-        private readonly IPdfSaveService _pdfSaveService;
+        private readonly IPdfDbService _pdfDbService;
 
-        public PdfEditingService (IPdfSaveService pdfSaveService)
+        public PdfEditingService (IPdfDbService pdfDbService)
         {
-            _pdfSaveService = pdfSaveService;
+            _pdfDbService = pdfDbService;
         }
 
         public Document AddAboutPage(Document src)
@@ -32,7 +32,7 @@ namespace PdfService.Services
             throw new NotImplementedException();
         }
 
-        public Document AddTitlePage(string lessonName, string lessonCode, String teacherName, string fakulteName, string sourcePath)
+        public Document AddTitlePage(string lessonName, string lessonCode, String teacherName, string fakulteName, string sourcePath, string year)
         {
 
             // Document nesnesi oluştur
@@ -59,7 +59,7 @@ namespace PdfService.Services
                 WriteToPdf(pdfWriter.DirectContent, lessonName + " -" + lessonCode, 15, 300, 420, BaseFont.TIMES_BOLD);
 
 
-                WriteToPdf(pdfWriter.DirectContent, "2024-2025 BAHAR", 15, 300, 350, BaseFont.TIMES_BOLD);
+                WriteToPdf(pdfWriter.DirectContent, year, 15, 300, 350, BaseFont.TIMES_BOLD);
 
 
                 WriteToPdf(pdfWriter.DirectContent, "DERS DOSYASI", 15, 300, 250, BaseFont.TIMES_BOLD);
@@ -173,7 +173,7 @@ namespace PdfService.Services
 
             // Bizim Oluşturmamız Gereken Dökümanlar:
 
-            var title_page = AddTitlePage(createMedekDto.LessonName, createMedekDto.LessonCode, createMedekDto.TeacherName, createMedekDto.FakulteName, sourcePath); // Create Title Page
+            var title_page = AddTitlePage(createMedekDto.LessonName, createMedekDto.LessonCode, createMedekDto.TeacherName + " " + createMedekDto.TeacherSurname, createMedekDto.FakulteName, sourcePath, createMedekDto.Year); // Create Title Page
 
 
             //Gönderilen Dökümanların Pdf e Eklenmesi
@@ -311,13 +311,12 @@ namespace PdfService.Services
             CreateMedekFormDto createMedekFormDto = new CreateMedekFormDto()
             {
                 Path = sourcePath + "/medek.pdf",
-                Name = "deneme",
-                LessonId = 12,
+                Name = createMedekDto.Name,
                 UserId = createMedekDto.UserId,
             };
 
 
-            await _pdfSaveService.MedekFormSaveToDb(createMedekFormDto);
+            await _pdfDbService.MedekFormSaveToDb(createMedekFormDto);
 
             return sourcePath + "/medek.pdf";
 

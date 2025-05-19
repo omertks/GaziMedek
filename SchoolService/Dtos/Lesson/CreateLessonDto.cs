@@ -2,15 +2,12 @@
 {
     public class CreateLessonDto
     {
-
-
-        public DateTime AcademicYear { get; set; }
-
-        public int BaseLessonId { get; set; }
+        public string Name { get; set; }
+        public string Code { get; set; }
+        public string AcademicYear { get; set; }
 
         public int TeacherId { get; set; }
-
-
-
+        public int DepartmentId { get; set; }
     }
+
 }

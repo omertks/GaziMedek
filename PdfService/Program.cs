@@ -42,7 +42,7 @@ namespace PdfService
             builder.Services.AddDbContext<PdfServiceDbContext>();
 
 
-            builder.Services.AddTransient<IPdfSaveService, PdfSaveService>();
+            builder.Services.AddTransient<IPdfDbService, PdfDbService>();
             
 
             //// Config Service

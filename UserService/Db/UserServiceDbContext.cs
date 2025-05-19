@@ -1,4 +1,4 @@
-﻿using Entity.Models;
+﻿using UserService.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace UserService.Db

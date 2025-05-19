@@ -1,4 +1,4 @@
-﻿using Entity.Models;
+﻿using UserService.Models;
 using Microsoft.EntityFrameworkCore;
 using UserService.Db;
 using UserService.Repository.Interfaces;
@@ -16,11 +16,13 @@ namespace UserService.Repository
         }
 
 
-        public async Task Create(User user)
+        public async Task<int> Create(User user)
         {
             await _context.users.AddAsync(user);
             await _context.SaveChangesAsync();
+            return user.Id; // Artık oluşturulan kaydın ID'sini döndürüyoruz.
         }
+
 
         public async Task Delete(int id)
         {

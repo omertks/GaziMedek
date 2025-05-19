@@ -14,6 +14,8 @@ namespace Entity.Models
         public string Email { get; set; }
         public string Password { get; set; }
 
+        public int TeacherId { get; set; }
+
         public UserRole Role { get; set; } // Kullanıcının rolü
 
     }

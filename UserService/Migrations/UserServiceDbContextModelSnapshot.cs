@@ -21,7 +21,7 @@ namespace UserService.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Entity.Models.User", b =>
+            modelBuilder.Entity("UserService.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -46,9 +46,6 @@ namespace UserService.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("Role")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TeacherId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

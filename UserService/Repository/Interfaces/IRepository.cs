@@ -1,4 +1,4 @@
-﻿using Entity.Models;
+﻿using UserService.Models;
 
 namespace UserService.Repository.Interfaces
 {
@@ -8,7 +8,7 @@ namespace UserService.Repository.Interfaces
 
         public Task<T> FindById(int id);
 
-        public Task Create(T entity);
+        public Task<int> Create(T entity);
 
         public Task Update(int id, T entity);
 

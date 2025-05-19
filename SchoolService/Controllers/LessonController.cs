@@ -5,82 +5,85 @@ using SchoolService.Services.Interfaces;
 namespace SchoolService.Controllers
 {
 
-    [ApiController]
+    using Microsoft.AspNetCore.Mvc;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
     [Route("api/[controller]")]
-    public class LessonController : Controller
+    [ApiController]
+    public class LessonController : ControllerBase
     {
-        private readonly ILessonService _LessonService;
+        private readonly ILessonService _lessonService;
 
-        public LessonController(ILessonService LessonService)
+        public LessonController(ILessonService lessonService)
         {
-            _LessonService = LessonService;
+            _lessonService = lessonService;
         }
 
+        // GET: api/lesson
         [HttpGet]
-        public async Task<IActionResult> GetAllLessonsByBaseLessonId([FromQuery] int baseLessonId, [FromQuery] int teacherId)
+        public async Task<IActionResult> GetAll()
         {
-
-            if(teacherId != null)
-            {
-                var lesson = await _LessonService.GetLessonsByTeacherId(teacherId);
-
-                return lesson != null ? Ok(lesson) : NotFound("Bu Kullanıcının Dersi Yok");
-            }
-
-            var Lessons = await _LessonService.GetAllLessonsByBaseLessonId(baseLessonId);
-
-            return Lessons != null ? Ok(Lessons) : NotFound("Lesson'ı Yok");
+            var lessons = await _lessonService.GetLessons();
+            return Ok(lessons);
         }
 
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllLessons()
-        {
-            var Lessons = await _LessonService.GetAllLessons();
-
-            return Lessons != null ? Ok(Lessons) : NotFound("Lesson Yok");
-        }
-
-
+        // GET: api/lessons/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetLessonById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
+            var lesson = await _lessonService.GetLessonById(id);
 
-            var Lesson = await _LessonService.GetLessonById(id);
-
-
-            return Lesson != null ? Ok(Lesson) : NotFound("Bu Id ye sahip bir Lesson Yok");
+            return lesson != null ? Ok(lesson) : NotFound();
         }
 
+        // GET: api/lessons/user/5
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetByUserId(int userId)
+        {
+            var lessons = await _lessonService.GetLessonsByUserId(userId);
+            return Ok(lessons);
+        }
 
+        // GET: api/lessons/department/5
+        [HttpGet("department/{departmentId}")]
+        public async Task<IActionResult> GetByDepartmentId(int departmentId)
+        {
+            var lessons = await _lessonService.GetLessonsByDepartmentId(departmentId);
+            return Ok(lessons);
+        }
 
+        // GET: api/lessons/university/5
+        [HttpGet("university/{universityId}")]
+        public async Task<IActionResult> GetByUniversityId(int universityId)
+        {
+            var lessons = await _lessonService.GetLessonsByUniversityId(universityId);
+            return Ok(lessons);
+        }
 
+        // POST: api/lessons
         [HttpPost]
-        public async Task<IActionResult> CreateLesson(CreateLessonDto createLessonDto)
+        public async Task<IActionResult> Create([FromBody] CreateLessonDto dto)
         {
-
-            await _LessonService.CreateLesson(createLessonDto);
-
-            return Created("", "");
+            await _lessonService.CreateLesson(dto);
+            return Ok(new { message = "Ders Oluşturudu." });
         }
 
-
-        [HttpPut]
-        public async Task<IActionResult> UpdateLesson(UpdateLessonDto updateLessonDto, int id)
+        // PUT: api/lessons/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateLessonDto dto)
         {
-
-            await _LessonService.UpdateLesson(updateLessonDto, id);
-
-            return Ok(new { message = "Ders Güncellendi !!!!" });
+            await _lessonService.UpdateLesson(dto, id);
+            return Ok(new { message = "Ders Güncellendi." });
         }
 
-
-        [HttpDelete]
-        public async Task<IActionResult> DeleteLesson(int id)
+        // DELETE: api/lessons/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
-
-            await _LessonService.DeleteLesson(id);
-
-            return Ok(new { message = "Ders Başarılı Bir Şekilde Silindi !!!" });
+            await _lessonService.DeleteLesson(id);
+            return Ok(new { message = "Ders Silindi." });
         }
     }
+
 }

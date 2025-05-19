@@ -5,11 +5,17 @@
 
         // Generic olabilir birden fazla dosya yüklenebilir
 
+        public int UserId { get; set; }
+
         public string FakulteName { get; set; } = "TUSAS KAZAN MYO";
 
-        public int UserId { get; set; }
+        // bu kısmı şimdi ekledim
+        public string Name { get; set; } // burası uniq yada anlamlı olmalı
         public string TeacherName { get; set; }
-        
+        public string TeacherSurname { get; set; }
+        public string Year { get; set; }
+
+
         public string LessonName { get; set; }
 
         public string LessonCode { get; set; }

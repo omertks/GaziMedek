@@ -3,7 +3,7 @@
     public class UpdateUniversityDto
     {
 
-        public string Name { get; set; }
+        public string UniversityName { get; set; }
 
     }
 }

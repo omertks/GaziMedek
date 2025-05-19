@@ -1,4 +1,4 @@
-﻿using Entity.Models;
+﻿using UserService.Models;
 
 namespace UserService.Repository.Interfaces
 {

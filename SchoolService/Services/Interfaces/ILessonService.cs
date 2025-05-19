@@ -6,13 +6,19 @@ namespace SchoolService.Services.Interfaces
     public interface ILessonService
     {
 
-        public Task<List<Lesson>> GetAllLessonsByBaseLessonId(int id);
+        public Task<List<ResultLessonDto>> GetLessons();
 
-        public Task<List<Lesson>> GetAllLessons();
+        public Task<ResultLessonDto> GetLessonById(int id);
 
-        public Task<Lesson> GetLessonById(int id);
+        public Task<List<ResultLessonDto>> GetLessonsByUserId(int id);
+        
+        public Task<List<ResultLessonDto>> GetLessonsByDepartmentId(int id);
+        
+        public Task<List<ResultLessonDto>> GetLessonsByUniversityId(int id);
 
-        public Task<List<ResultLessonDto>> GetLessonsByTeacherId(int id);
+
+
+
 
         public Task CreateLesson(CreateLessonDto createLessonDto);
 

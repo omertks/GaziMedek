@@ -1,12 +1,15 @@
-﻿using Dto.Dtos.User;
-using Entity.Models;
+﻿using UserService.Dtos.User;
+using UserService.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using UserService.Dtos.User;
 using UserService.Repository.Interfaces;
 using UserService.Service.Interfaces;
+using UserService.Enums;
+using UserService.Dtos.Teacher;
+
+
 
 namespace UserService.Service
 {
@@ -15,6 +18,8 @@ namespace UserService.Service
 
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly IHttpClientFactory _httpClientFactory;
+
 
         // Jwt için gerekli parametreler
         private readonly string _jwtKey;
@@ -22,7 +27,7 @@ namespace UserService.Service
         private readonly string _jwtAudience;
 
 
-        public UserManager(IUserRepository userRepository, IConfiguration configuration)
+        public UserManager(IUserRepository userRepository, IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
             _userRepository = userRepository;
             _configuration = configuration;
@@ -30,6 +35,7 @@ namespace UserService.Service
             _jwtKey = configuration["Jwt:Key"];
             _jwtIssuer = configuration["Jwt:Issuer"];
             _jwtAudience = configuration["Jwt:Audience"];
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task Create(User entity)
@@ -72,7 +78,6 @@ namespace UserService.Service
                 resultUserDto.IsLogin = true;
                 resultUserDto.Token = token;
                 resultUserDto.UserId = user.Id;
-                resultUserDto.TeacherId = user.TeacherId;
 
                 resultUserDto.Role = user.Role.ToString();
 
@@ -81,7 +86,42 @@ namespace UserService.Service
 
         }
 
+        public async Task SaveUserAsync(CreateUserDto createUserDto)
+        {
+            // 1. Map CreateUserDto to User entity ve UserService DB'sine kaydet
+            var user = new User
+            {
+                FirstName = createUserDto.Name,
+                LastName = createUserDto.Surname,
+                
+                Email = createUserDto.Email,
+                Password = createUserDto.Password, 
+                Role = (UserRole)createUserDto.Role
+            };
 
+            var userId = await _userRepository.Create(user);
+
+            CreateTeacherDto createTeacherDto = new CreateTeacherDto()
+            {
+                DepartmentId = createUserDto.DepartmentId,
+                Name = createUserDto.Name,
+                Surname = createUserDto.Surname,
+                Role = createUserDto.Role.ToString(),
+                UserId = userId
+            };
+
+            string schoolServiceUrl = _configuration["SchoolServiceUrl"]; 
+            var client = _httpClientFactory.CreateClient();
+
+            
+            var schoolResponse = await client.PostAsJsonAsync($"{schoolServiceUrl}/user", createTeacherDto);
+
+            if (!schoolResponse.IsSuccessStatusCode)
+            {
+                // Bu durumda UserService DB'sine kayıt başarılı ama SchoolService'de hata var.
+                Console.WriteLine("Status Code: " + schoolResponse.StatusCode + "UserService kaydı tamamlandı ancak SchoolService'de hata oluştu.");
+            }
+        }
 
         public async Task Update(int id, User entity)
         {

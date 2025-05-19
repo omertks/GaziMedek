@@ -3,15 +3,18 @@
     public class Lesson : BaseEntity
     {
 
+        public string Name { get; set; }
 
-        public DateTime AcademicYear { get; set; } // Burayı stringe çek
+        public string Code { get; set; }
+
+
+        public string AcademicYear { get; set; } // Burayı stringe çek
+
 
         public int TeacherId { get; set; }
-        public Teacher Teacher { get; set; }
+        public User Teacher { get; set; }
 
-
-        public int BaseLessonId { get; set; }
-        public BaseLesson BaseLesson { get; set; }
-
+        public int DepartmentId { get; set; }
+        public Department Department { get; set; }
     }
 }

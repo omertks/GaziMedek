@@ -1,5 +1,5 @@
 
-using Entity.Models;
+using UserService.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -29,11 +29,18 @@ namespace UserService
             });
 
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+     .AddJsonOptions(options =>
+     {
+         // String olarak gelen enum deðerlerini dönüþtürmeyi saðlar
+         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+     });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // HttpClient desteðini ekleyin
+            builder.Services.AddHttpClient();
 
             var jwtSettings = builder.Configuration.GetSection("Jwt"); // Burada appsettins.json dosyasýnda bulunan Jwt objesine eriþtim
 
